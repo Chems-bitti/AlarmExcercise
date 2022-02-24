@@ -1,5 +1,5 @@
 # Fire Alarm
-Configuring LPC1768 microcontroller to generate PWM signal for fans and alarm depending on temperature on Keil µVision IDE. Subject of an exercise in my microcontroller's course at Sorbonne University.
+Configuring LPC1768 microcontroller to generate PWM signal for fans and alarm depending on temperature on Keil µVision IDE. Subject of an exercise in my microcontroller course at Sorbonne University.
 # Exercise Criteria:
 We have a temperature sensor that computes a value on 8 bits (connected to P0.16 to P0.23). When a new value is computed, a bit we call "new" (connected to P0.2) is reset to 0.
 
