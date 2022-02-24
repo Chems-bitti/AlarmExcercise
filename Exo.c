@@ -69,41 +69,40 @@ void init_TIMER2() {
      
 /* Initialize PWM   */
 void init_PWM() {
-	LPC_PINCON->PINSEL3 |= (1 << 9) | (1 << 15); // Mettre P1.20 et P1.23 en PWM1.2 et PWM1.3 repectivement
-	LPC_PWM1->PCR |= (3 << 10); // Activation du PWM1.2 et PWM1.3
-	LPC_PWM1->MR0 = 25E6/60E3; // fréquence de 60KHz
-  LPC_PWM1->LER |= 1; // Mise à jour du MR0 chez PWM	
-	LPC_PWM1->MR2 = 0; // 0% de rapport cyclique, signal PWM1.2 mis à 0
-	LPC_PWM1->MR3 = 0; // 0% de rapport cyclique, signal PWM1.3 désactivé
-	LPC_PWM1->MCR |= 2; // Reset sur la période
-	LPC_PWM1->TCR |= 1 << 3; // Activation du mode PWM
+	LPC_PINCON->PINSEL3 |= (1 << 9) | (1 << 15); // Configure P1.20 and P1.23 to PWM1.2 and PWM1.3 
+	LPC_PWM1->PCR |= (3 << 10); // Activate PWM1.2 and PWM1.3
+	LPC_PWM1->MR0 = 25E6/60E3; // Set frequency to 60KHz
+  	LPC_PWM1->LER |= 1; // Update MR0	
+	LPC_PWM1->MR2 = 0; // 0% Duty cycle for PWM1.2
+	LPC_PWM1->MR3 = 0; // 0% Duty cycle for PWM1.2
+	LPC_PWM1->MCR |= 2; // Reset timer when you reach MR0
+	LPC_PWM1->TCR |= 1 << 3; // Activate PWM Mode
 }
 void init_GPIO() {
-	LPC_PINCON->PINSEL0 &= ~(3 << 4); // ligne New en GPIO sur P0.2
-	LPC_GPIO0->FIODIR &= ~(1 << 2); // ligne New en entrée sur P0.2
-	LPC_GPIO0->FIOPIN |= 1 << 2; // mise à 1 de P0.2, pas de nouveau échantillon
-	LPC_PINCON->PINSEL1 &= ~( 0xFF ); // P0.16->P0.23 en GPIO
-	LPC_GPIO0->FIODIR &= ~(0xFF << 16); // P0.16->P0.23 en entrée
-	LPC_GPIO0->FIOPIN &= ~(0xFF << 16); // Mise à 0 de P0.16->P0.23
+	LPC_PINCON->PINSEL0 &= ~(3 << 4); // Set P0.2 to GPIO mode
+	LPC_GPIO0->FIODIR &= ~(1 << 2); // Set P0.2 as input
+	LPC_PINCON->PINSEL1 &= ~( 0xFF ); // P0.16->P0.23 as GPIO
+	LPC_GPIO0->FIODIR &= ~(0xFF << 16); // P0.16->P0.23 as input
 	
-	LPC_PINCON->PINSEL4 &= ~(3<<12); // P2.6 en GPIO
-	LPC_GPIO2->FIODIR |= 1 << 6;
-	LPC_GPIO2->FIOPIN &= ~(1<<6);
+	LPC_PINCON->PINSEL4 &= ~(3<<12); // P2.6 as GPIO
+	LPC_GPIO2->FIODIR |= 1 << 6; // P2.6 as output
+	LPC_GPIO2->FIOPIN &= ~(1<<6); // Reset P2.6 to 0
 	
 }
 
 void init_IR() {
-	LPC_GPIOINT->IO0IntEnF |= 1 << 2; // interruption si on a un nouveau échantillon
-	LPC_GPIOINT->IO0IntClr |= 1 << 2;
-	NVIC_EnableIRQ(EINT2_IRQn);
+	LPC_GPIOINT->IO0IntEnF |= 1 << 2; // Generate interrupt if there's a new sample, so if P0.2 becomes 0 (falling edge)
+	LPC_GPIOINT->IO0IntClr |= 1 << 2; // Clear pending interrupts
+	NVIC_EnableIRQ(EINT2_IRQn); // Enable interrupt
 }
 int main() {
+	// Initialize everything
 	init_GPIO();
 	init_IR();
 	init_PWM();
 	init_TIMER0();
 	init_TIMER2();
-	
+	// Wait
 	while(1);
 	
 	return 0;
